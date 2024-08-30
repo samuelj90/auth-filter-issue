@@ -30,9 +30,10 @@ jobs:
     - name: Run tests with Maven
       run: mvn test
     - name: Generate coverage report
-      run: mvn jacoco:report
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage-report
-        path: target/site/jacoco
+      run: |
+        mvn exec-maven-plugin:exec@report-aggregate
+        mvn jacoco:report
+    - name: Display coverage report
+      run: |
+        mvn jacoco:report-aggregate
+        bash <(curl -s https://codecov.io/bash)
