@@ -1,6 +1,6 @@
 {
     "name": "Java Spring Boot Dev Container",
-    "image": "mcr.microsoft.com/vscode/devcontainers/java:0-17",
+    "image": "mcr.microsoft.com/devcontainers/java:17-bullseye",
     "customizations": {
         "vscode": {
             "settings": {
@@ -14,9 +14,12 @@
             ]
         }
     },
-    "forwardPorts": [
-        8080
-    ],
     "postCreateCommand": "./watch-tests.sh",
-    "remoteUser": "vscode"
+    "remoteUser": "vscode",
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "17",
+            "installMaven": "true"
+        }
+    }
 }
