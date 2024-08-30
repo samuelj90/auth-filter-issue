@@ -31,6 +31,7 @@
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 		<springdoc-openapi-ui.version>2.6.0</springdoc-openapi-ui.version>
 		<nimbus-jose-jwt.version>9.6</nimbus-jose-jwt.version>
+		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -114,6 +115,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
