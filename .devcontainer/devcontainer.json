@@ -1,0 +1,22 @@
+{
+    "name": "Java Spring Boot Dev Container",
+    "image": "mcr.microsoft.com/vscode/devcontainers/java:0-17",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "pivotal.vscode-spring-boot",
+                "vscjava.vscode-maven",
+                "redhat.vscode-xml"
+            ]
+        }
+    },
+    "forwardPorts": [
+        8080
+    ],
+    "postCreateCommand": "./watch-tests.sh",
+    "remoteUser": "vscode"
+}
