@@ -10,16 +10,18 @@
                 "vscjava.vscode-java-pack",
                 "pivotal.vscode-spring-boot",
                 "vscjava.vscode-maven",
-                "redhat.vscode-xml"
+                "redhat.vscode-xml",
+                "github.vscode-github-actions",
+                "redhat.fabric8-analytics"
             ]
         }
     },
-    "postCreateCommand": "./watch-tests.sh",
+    "postCreateCommand": "mvn clean install",
     "remoteUser": "vscode",
     "features": {
         "ghcr.io/devcontainers/features/java:1": {
             "version": "17",
             "installMaven": "true"
-        }
+        } 
     }
 }
