@@ -1,6 +1,7 @@
 package com.example.app.oauthserver.config;
 
 import com.example.app.oauthserver.filter.CustomAuthenticationFilter;
+import com.example.app.oauthserver.manager.CustomAuthenticationManager;
 import com.example.app.oauthserver.util.CustomOauthServerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,16 @@ import org.springframework.web.server.ServerWebExchange;
 @EnableWebFluxSecurity
 @Slf4j
 public class SecurityConfig {
-    private final CustomAuthenticationFilter customAuthenticationWebFilter;
+    private final CustomAuthenticationManager customAuthenticationManager;
     private final CustomOauthServerUtil util;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        // Constructed directly — NOT exposed as a @Bean — so Spring WebFlux does NOT
+        // auto-register it as a global WebFilter alongside the security chain registration.
+        CustomAuthenticationFilter customAuthenticationFilter =
+                new CustomAuthenticationFilter(customAuthenticationManager, util);
+
         return http.authorizeExchange(customizer -> customizer.
                         pathMatchers(HttpMethod.GET, "/actuator/info").permitAll().
                         pathMatchers(HttpMethod.GET, "/actuator/health").permitAll().
@@ -39,7 +45,7 @@ public class SecurityConfig {
                         anyExchange().denyAll()
                 ).
                 csrf(ServerHttpSecurity.CsrfSpec::disable).
-                addFilterAt(customAuthenticationWebFilter, SecurityWebFiltersOrder.FORM_LOGIN).
+                addFilterAt(customAuthenticationFilter, SecurityWebFiltersOrder.FORM_LOGIN).
                 exceptionHandling(customizer -> customizer.
                         authenticationEntryPoint(
                                 (ServerWebExchange exchange, AuthenticationException ex) ->
