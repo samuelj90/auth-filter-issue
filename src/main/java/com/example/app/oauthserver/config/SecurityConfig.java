@@ -26,12 +26,12 @@ public class SecurityConfig {
     private final CustomOauthServerUtil util;
 
     @Bean
-    public CustomAuthenticationFilter customAuthenticationFilter() {
-        return new CustomAuthenticationFilter(customAuthenticationManager, util);
-    }
-
-    @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        // Constructed directly — NOT exposed as a @Bean — so Spring WebFlux does NOT
+        // auto-register it as a global WebFilter alongside the security chain registration.
+        CustomAuthenticationFilter customAuthenticationFilter =
+                new CustomAuthenticationFilter(customAuthenticationManager, util);
+
         return http.authorizeExchange(customizer -> customizer.
                         pathMatchers(HttpMethod.GET, "/actuator/info").permitAll().
                         pathMatchers(HttpMethod.GET, "/actuator/health").permitAll().
@@ -45,7 +45,7 @@ public class SecurityConfig {
                         anyExchange().denyAll()
                 ).
                 csrf(ServerHttpSecurity.CsrfSpec::disable).
-                addFilterAt(customAuthenticationFilter(), SecurityWebFiltersOrder.FORM_LOGIN).
+                addFilterAt(customAuthenticationFilter, SecurityWebFiltersOrder.FORM_LOGIN).
                 exceptionHandling(customizer -> customizer.
                         authenticationEntryPoint(
                                 (ServerWebExchange exchange, AuthenticationException ex) ->
