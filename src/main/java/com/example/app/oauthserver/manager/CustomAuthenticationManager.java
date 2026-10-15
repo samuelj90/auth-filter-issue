@@ -10,7 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -66,7 +66,6 @@ public class CustomAuthenticationManager implements ReactiveAuthenticationManage
                                     clientDetails.getOauthClientDetails().getAccessTokenValidity(),
                                     true
                             );
-                            SecurityContextHolder.getContext().setAuthentication(authenticatedToken);
                             return Mono.just(authenticatedToken);
                         });
             } catch (Exception e) {

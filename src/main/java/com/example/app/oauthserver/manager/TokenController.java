@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -71,15 +71,17 @@ public class TokenController {
     public Mono<TokenResponse> getToken(@ModelAttribute
                                         @Parameter(description = "Request to generate a new token", required = true) TokenRequest tokenRequest) {
         log.info("Token request received for AppCode: {}", tokenRequest.getAppCode());
-        Authentication authenticationToken = SecurityContextHolder.getContext().getAuthentication();
-        if (authenticationToken instanceof CustomAuthenticationToken token) {
-            if (token.getClientId().equals(tokenRequest.getClientId()) &&
-                    token.getGrantType().equals(tokenRequest.getGrantType())) {
-                return util.getTokenResponse(token);
-            }
-            log.error("ClientId and GrantType mismatch for AppCode: {}", tokenRequest.getAppCode());
-        }
-        return Mono.error(new BadCredentialsException("Invalid Authentication Details"));
-
+        return ReactiveSecurityContextHolder.getContext()
+                .map(ctx -> ctx.getAuthentication())
+                .flatMap(authentication -> {
+                    if (authentication instanceof CustomAuthenticationToken token) {
+                        if (token.getClientId().equals(tokenRequest.getClientId()) &&
+                                token.getGrantType().equals(tokenRequest.getGrantType())) {
+                            return util.getTokenResponse(token);
+                        }
+                        log.error("ClientId and GrantType mismatch for AppCode: {}", tokenRequest.getAppCode());
+                    }
+                    return Mono.<TokenResponse>error(new BadCredentialsException("Invalid Authentication Details"));
+                });
     }
 }
